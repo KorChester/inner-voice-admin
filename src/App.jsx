@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const APP_VERSION = "1.1.1";
+const APP_VERSION = "1.1.2";
 const SUPABASE_URL = "https://supabase.physiques-unlimited.de";
 const SUPABASE_ANON_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc3NDk1NTc2MCwiZXhwIjo0OTMwNjI5MzYwLCJyb2xlIjoiYW5vbiJ9.oOYnXD3j3A2VTIaFN9Ratq1X-rhGgTw8blBBRFkuP50";
 
@@ -66,7 +66,7 @@ const getClientOverview = (clientId, allSessions, allJournal) => {
   const posPct = total ? Math.round(pos / total * 100) : 0;
   const neuPct = total ? 100 - negPct - posPct : 0;
   const mon = mondayOfWeek(new Date());
-  const sessionsThisWeek = [...new Set(cS.filter(s => new Date(s.created_at) >= mon).map(s => s.created_at.slice(0, 10)))].length;
+  const sessionsThisWeek = [...new Set(cS.filter(s => new Date(s.created_at) >= mon).map(s => { const d = new Date(s.created_at); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }))].length;
   const hasData = cS.length > 0 || cJ.length > 0;
   let status = "green";
   if (!hasData) status = "new";
@@ -289,7 +289,7 @@ function ClientDetailPage({ client, detail, allSessions, allJournal, getOv, onBa
       const mon = mondayOfWeek(now, w); const sun = new Date(mon); sun.setDate(mon.getDate() + 7);
       const wS = detail.sessions.filter(s => { const d = new Date(s.created_at); return d >= mon && d < sun; });
       const wJ = detail.journal.filter(j => { const d = new Date(j.created_at); return d >= mon && d < sun; });
-      const exerciseDays = [...new Set(wS.map(s => s.created_at.slice(0, 10)))].length;
+      const exerciseDays = [...new Set(wS.map(s => { const d = new Date(s.created_at); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }))].length;
       const moods = wJ.map(j => j.mood);
       const moodAvg = moods.length ? moods.reduce((a, b) => a + b, 0) / moods.length : null;
       const neg = wJ.filter(j => j.self_talk_type === "negative").length, pos = wJ.filter(j => j.self_talk_type === "positive").length, total = wJ.length;
